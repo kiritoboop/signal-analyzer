@@ -1,0 +1,62 @@
+// ===================================
+// KONVOLUSI DISKRIT
+// x[n] = {0,1,0,1}
+// h[n] = {1,1,1}
+// ===================================
+
+int x[] = {0, 1, 0, 1};
+int h[] = {1, 1, 1};
+
+const int Nx = sizeof(x) / sizeof(x[0]);
+const int Nh = sizeof(h) / sizeof(h[0]);
+
+const int Ny = Nx + Nh - 1;
+
+int y[Ny];
+
+void setup()
+{
+  Serial.begin(115200);
+
+  // Inisialisasi output
+  for(int i=0;i<Ny;i++)
+  {
+    y[i]=0;
+  }
+
+  // Proses konvolusi
+  for(int n=0;n<Ny;n++)
+  {
+    for(int k=0;k<Nx;k++)
+    {
+      if((n-k)>=0 && (n-k)<Nh)
+      {
+        y[n] += x[k] * h[n-k];
+      }
+    }
+  }
+
+  Serial.println("===== HASIL KONVOLUSI =====");
+
+  for(int i=0;i<Ny;i++)
+  {
+    Serial.print("y[");
+    Serial.print(i);
+    Serial.print("] = ");
+    Serial.println(y[i]);
+  }
+
+  Serial.println("==========================");
+}
+
+void loop()
+{
+  // Kirim ke Serial Plotter
+  for(int i=0;i<Ny;i++)
+  {
+    Serial.println(y[i]);
+    delay(500);
+  }
+
+  delay(2000);
+}
