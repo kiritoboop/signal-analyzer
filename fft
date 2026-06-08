@@ -1,0 +1,55 @@
+#include <arduinoFFT.h>
+
+#define SAMPLES 128
+#define SAMPLING_FREQUENCY 1000
+
+double vReal[SAMPLES];
+double vImag[SAMPLES];
+
+ArduinoFFT<double> FFT(vReal, vImag, SAMPLES, SAMPLING_FREQUENCY);
+
+const int outputPin = 9;
+
+void setup()
+{
+  Serial.begin(115200);
+
+  pinMode(outputPin, OUTPUT);
+}
+
+void loop()
+{
+  // Membuat sinyal 50 Hz
+  for(int i = 0; i < SAMPLES; i++)
+  {
+    float t = (float)i / SAMPLING_FREQUENCY;
+
+    float signal = 512 + 300*sin(2*PI*50*t);
+
+    analogWrite(outputPin, signal/4);
+
+    vReal[i] = signal;
+    vImag[i] = 0;
+  }
+
+  FFT.windowing(FFTWindow::Hamming, FFTDirection::Forward);
+
+  FFT.compute(FFTDirection::Forward);
+
+  FFT.complexToMagnitude();
+
+  Serial.println("FFT:");
+
+  for(int i = 1; i < SAMPLES/2; i++)
+  {
+    Serial.println(vReal[i]);
+  }
+
+  double peak = FFT.majorPeak();
+
+  Serial.print("Dominan = ");
+  Serial.print(peak);
+  Serial.println(" Hz");
+
+  delay(2000);
+}
